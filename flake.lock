@@ -182,6 +182,21 @@
         "type": "github"
       }
     },
+    "options-search": {
+      "locked": {
+        "lastModified": 1740571182,
+        "narHash": "sha256-3NTN3HA9vMXWhP+vZzyISEg1PmrfPaRcQ/0kwGD9IGs=",
+        "owner": "raphiz",
+        "repo": "options-search",
+        "rev": "424151eb79a3228b7863122a914d6bc3fb661957",
+        "type": "github"
+      },
+      "original": {
+        "owner": "raphiz",
+        "repo": "options-search",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "blueprint": "blueprint",
@@ -189,6 +204,7 @@
         "devshell": "devshell",
         "git-hooks-nix": "git-hooks-nix",
         "nixpkgs": "nixpkgs_2",
+        "options-search": "options-search",
         "systems": "systems"
       }
     },

@@ -8,61 +8,22 @@
 perSystem.devshell.mkShell ({
   config,
   options,
-  lib,
   ...
 }: let
-  # TODO: Create builder function that accepts pkgs, mappings list and options
-  sourceMappings = [
-    {
-      # TODO: magically derive via lockfile
-      flakeInput = {
-        inherit flake;
-        name = "devshell";
-      };
-
-      # But can be done manually as well
-      source = flake.inputs.devshell.outPath;
-      prefix = "https://github.com/numtide/devshell/blob/${flake.inputs.devshell.rev}";
-    }
-    # TODO: Test "self"
-    {
-      source = flake.outPath;
-      prefix = "";
-    }
-  ];
-
-  # TODO: Clean up
-  # TODO: Are there Hidden or Internal flags? eg. _module.args should be hidden
-  transformDeclarations = path: let
-    matches = lib.filter (mapping: lib.hasPrefix mapping.source (toString path)) sourceMappings;
-  in
-    if matches != []
-    then let
-      mapping = lib.head matches;
-      relativePath = lib.removePrefix mapping.source (toString path);
-    in
-      mapping.prefix + relativePath
-    else path;
-
-  optionsDoc = pkgs.nixosOptionsDoc {
-    inherit options;
-    transformOptions = opt:
-      opt
-      // {
-        declarations = builtins.map transformDeclarations opt.declarations;
-      };
+  showCommand = flake.inputs.options-search.lib.mkOptionsSearch {
+    inherit pkgs options;
+    name = "show-devshell-options";
+    sourceMappings = [
+      {
+        source = flake.inputs.devshell.outPath;
+        prefix = "https://github.com/numtide/devshell/blob/${flake.inputs.devshell.rev}";
+      }
+      {
+        source = flake.outPath;
+        prefix = "";
+      }
+    ];
   };
-  showCommand = let
-    name = "show-options";
-    optionsJson = "${optionsDoc.optionsJSON}/share/doc/nixos/options.json";
-  in
-    pkgs.writeShellApplication {
-      inherit name;
-      runtimeInputs = [pkgs.jq pkgs.fzf pkgs.mdcat];
-      text = ''
-        jq -r 'keys[]' ${optionsJson} | fzf "$@" --preview 'jq -r --arg key {-1} -f ${./format_options.jq} ${optionsJson} | mdcat'
-      '';
-    };
 in {
   devshell = {
     name = ''Example Application'';
@@ -102,9 +63,8 @@ in {
       command = ''pre-commit run --all-files "''${@}"'';
     }
     {
-      name = "show-devshell-options";
+      package = showCommand;
       help = "List and describe all available devshell options";
-      command = ''${lib.getExe showCommand} "''${@}"'';
     }
   ];
 })

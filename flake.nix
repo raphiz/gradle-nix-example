@@ -16,6 +16,8 @@
 
     build-gradle-application.url = "github:raphiz/buildGradleApplication";
     build-gradle-application.inputs.nixpkgs.follows = "nixpkgs";
+
+    options-search.url = "github:raphiz/options-search";
   };
   outputs = inputs:
     inputs.blueprint {
